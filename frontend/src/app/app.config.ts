@@ -1,3 +1,5 @@
+
+import { provideHttpClient } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, Routes } from '@angular/router';
 import { LoginPage } from './login';
@@ -19,6 +21,7 @@ const workspaceRoutes: Routes = [
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(),
     provideBrowserGlobalErrorListeners(),
     provideRouter([
       { path: '', pathMatch: 'full', redirectTo: 'login' },

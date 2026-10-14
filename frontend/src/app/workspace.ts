@@ -1,3 +1,4 @@
+import { OrdensServicoService, OrdemServico } from './ordens-servico.service';
 import { Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -37,7 +38,7 @@ interface Item {
 })
 export class WorkspacePage {
   private readonly router = inject(Router);
-
+  private readonly ordensServicoService = inject(OrdensServicoService);
   protected activePage: Page = 'dashboard';
   protected searchTerm = '';
   protected statusFilter = 'Todos';
@@ -284,6 +285,41 @@ export class WorkspacePage {
 
   protected saveRecord(): void {
     if (!this.isListPage(this.activePage)) return;
+
+    if (this.activePage === 'orders') {
+      const cliente = this.draft['customer']?.trim();
+      const equipamento = this.draft['name']?.trim();
+      const defeitoRelatado = this.draft['detail']?.trim();
+
+      if (!cliente || !equipamento || !defeitoRelatado) {
+        this.showToast('Preencha todos os campos da ordem de serviço.');
+        return;
+      }
+
+      this.ordensServicoService
+        .criar({ cliente, equipamento, defeitoRelatado })
+        .subscribe({
+          next: (ordem) => {
+            const item = this.converterOrdem(ordem);
+
+            this.records.orders.unshift(item);
+            this.selectedItem = item;
+            this.showCreateDialog = false;
+            this.draft = {};
+
+            this.showToast('Ordem de serviço cadastrada com sucesso.');
+          },
+          error: (erro) => {
+            console.error('Erro ao cadastrar ordem de serviço:', erro);
+            this.showToast(
+              'Não foi possível cadastrar a ordem. Confira os dados e o backend.',
+            );
+          },
+        });
+
+      return;
+    }
+
     const name = this.draft['name']?.trim() || this.draft['customer']?.trim();
     if (!name) {
       this.showToast('Preencha pelo menos o nome do registro.');
@@ -314,6 +350,59 @@ export class WorkspacePage {
     this.showCreateDialog = false;
     this.showToast('Registro adicionado à lista desta demonstração.');
   }
+
+
+  private carregarOrdens(): void {
+    this.ordensServicoService.listar().subscribe({
+      next: (ordens) => {
+        const itens = ordens.map((ordem) => this.converterOrdem(ordem));
+
+        this.records.orders.splice(
+          0,
+          this.records.orders.length,
+          ...itens,
+        );
+      },
+      error: () => {
+        this.showToast(
+          'Não foi possível carregar as ordens. Verifique se o backend está ativo.',
+        );
+      },
+    });
+  }
+
+  private converterOrdem(ordem: OrdemServico): Item {
+    const statusMap: Record<string, string> = {
+      RECEBIDO: 'Recebida',
+      EM_ANALISE: 'Em diagnóstico',
+      EM_REPARO: 'Em reparo',
+      AGUARDANDO_PECA: 'Aguardando peça',
+      PRONTO: 'Pronta',
+      ENTREGUE: 'Entregue',
+    };
+
+    const valorTotal =
+      (ordem.valorMaoDeObra ?? 0) + (ordem.valorPecas ?? 0);
+
+    return {
+      id: `OS #${ordem.id}`,
+      name: ordem.cliente,
+      detail: `${ordem.equipamento} · ${ordem.defeitoRelatado}`,
+      category: ordem.diagnostico ?? 'Sem diagnóstico',
+      status: statusMap[ordem.status] ?? ordem.status ?? 'Recebida',
+      value:
+        ordem.valorMaoDeObra !== undefined ||
+          ordem.valorPecas !== undefined
+          ? valorTotal.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          })
+          : 'A definir',
+      customer: ordem.cliente,
+      date: new Date(ordem.criadaEm).toLocaleDateString('pt-BR'),
+    };
+  }
+
 
   protected chooseItem(item: Item): void {
     this.selectedItem = item;
@@ -493,6 +582,9 @@ export class WorkspacePage {
       'portal',
     ];
     this.activePage = pages.includes(path as Page) ? (path as Page) : 'dashboard';
+    if (this.activePage === 'orders') {
+      this.carregarOrdens();
+    }
     if (this.activePage !== 'order-detail') {
       this.selectedItem = null;
     }
