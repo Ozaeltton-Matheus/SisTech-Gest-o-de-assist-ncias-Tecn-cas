@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UsuariosModule } from './usuarios/usuarios.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -11,10 +13,12 @@ import { AppService } from './app.service';
       port: Number(process.env.DB_PORT) || 5432,
       username: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASSWORD || 'postgrespassword',
-      database: process.env.DB_NAME || 'assistos_db',
+      database: process.env.DB_NAME || 'sistech_db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,
     }),
+    UsuariosModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
