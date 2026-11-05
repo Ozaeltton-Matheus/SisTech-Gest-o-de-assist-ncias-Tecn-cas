@@ -3,17 +3,20 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
 @Entity('usuario')
 export class Usuario{
     @PrimaryGeneratedColumn({name: 'id_usuario'})
-    id: number;
+    id?: number;
+
+    @Column({name: 'nome', length: 30})
+    nome!: string;
 
     @Column({ length: 150, unique: true })
-    email: string;
+    email!: string;
 
-    @Column({ length: 255 })
-    senha: string;
+    @Column({name: 'senha', length: 255 })
+    senha!: string;
 
-    @Column({ name: 'tipo_usuario'})
-    tipo_usuario: string;
+    @Column({ name: 'tipo_usuario', length: 50})
+    tipo_usuario!: string;
     
     @Column({ default: true})
-    ativo: boolean;
+    ativo?: boolean;
 }   
