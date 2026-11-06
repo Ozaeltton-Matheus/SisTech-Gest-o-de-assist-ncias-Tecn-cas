@@ -2,8 +2,8 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
   JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Usuario } from './usuarios.entity';
 
@@ -12,12 +12,9 @@ export class Funcionario {
   @PrimaryGeneratedColumn({ name: 'id_funcionario' })
   id_funcionario!: number;
 
-  @Column({ name: 'id_usuario', type: 'int' })
-  id_usuario!: number;
-
-  @OneToOne(() => Usuario)
+  @ManyToOne(() => Usuario, usuario => usuario.funcionarios)
   @JoinColumn({ name: 'id_usuario' })
-  usuario?: Usuario;
+  usuario!: Usuario;
 
   @Column({ type: 'varchar', length: 150 })
   nome!: string;

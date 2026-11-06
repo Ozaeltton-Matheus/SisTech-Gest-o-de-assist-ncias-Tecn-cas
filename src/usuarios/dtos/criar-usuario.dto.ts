@@ -1,4 +1,4 @@
-import {IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CriarUsuarioDTO {
 
@@ -16,6 +16,23 @@ export class CriarUsuarioDTO {
     senha!: string;
 
     @IsString()
+    @IsNotEmpty()
+    cpf!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    endereco!: string;
+
+    @IsString()
+    @IsNotEmpty()
+    telefone!: string;
+
+    @IsString()
+    @IsOptional()
+    cargo?: string;
+
+    @IsString()
+    @IsIn(['Cliente', 'Funcionario'])
     @IsNotEmpty({message: 'O tipo do usuário é obrigatório' })
     tipo_usuario!: string;
 
