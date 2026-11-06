@@ -13,6 +13,10 @@ export class CreateTableFuncionario1793819186365 implements MigrationInterface {
 	"cargo" BLOB NOT NULL,
 	"ativo" BOOLEAN NOT NULL DEFAULT true,
 	PRIMARY KEY("id_funcionario")
+
+    CONSTRAINT "fk_funcionario_usuario"
+        FOREIGN KEY ("id_usuario")
+        REFERENCES "usuario" ("id_usuario")
 );
 
 
