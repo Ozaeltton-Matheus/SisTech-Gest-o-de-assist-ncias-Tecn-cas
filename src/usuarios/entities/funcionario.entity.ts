@@ -4,6 +4,7 @@ import {
   Column,
   JoinColumn,
   ManyToOne,
+  CreateDateColumn
 } from 'typeorm';
 import { Usuario } from './usuarios.entity';
 
@@ -27,6 +28,9 @@ export class Funcionario {
 
   @Column({ type: 'varchar', length: 100 })
   cargo!: string;
+
+  @CreateDateColumn({ name: 'data_cadastro', type: 'timestamptz' })
+  data_cadastro!: Date;
 
   @Column({ type: 'boolean', default: true })
   ativo!: boolean;
