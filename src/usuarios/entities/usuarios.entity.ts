@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { Cliente } from "./cliente.entity";
 import { Funcionario } from "./funcionario.entity";
 
@@ -15,7 +15,7 @@ export class Usuario{
 
     @Column({ name: 'tipo_usuario', length: 50})
     tipo_usuario!: string;
-    
+
     @Column({ default: true})
     ativo?: boolean;
 
