@@ -1,0 +1,79 @@
+<main class="flex min-h-screen items-center justify-center bg-[#f2f5f9] p-0 sm:p-6 lg:p-10">
+  <section
+    aria-label="Acesso à Sistecnica"
+    class="grid min-h-screen w-full max-w-6xl overflow-hidden bg-white sm:min-h-0 sm:rounded-[2rem] sm:shadow-[0_28px_90px_-38px_rgba(18,48,74,0.28)] lg:grid-cols-[0.95fr_1.05fr]"
+  >
+    <aside
+      aria-label="Sobre a Sistecnica"
+      class="brand-panel relative isolate flex min-h-[19rem] flex-col justify-between overflow-hidden bg-[#12304a] px-7 py-8 text-white sm:min-h-[22rem] sm:px-10 sm:py-10 lg:min-h-[690px] lg:px-12 lg:py-12"
+    >
+      <div aria-hidden="true" class="brand-orbit brand-orbit-one"></div>
+      <div aria-hidden="true" class="brand-orbit brand-orbit-two"></div>
+      <div aria-hidden="true" class="brand-grid"></div>
+      <a class="relative z-10 inline-flex w-fit items-center gap-3" href="/login">
+        <span class="flex size-11 items-center justify-center rounded-2xl bg-[#3478ed] text-xl font-bold">S</span>
+        <span><span class="block text-sm font-bold tracking-[0.16em]">SISTECNICA</span><span class="mt-0.5 block text-[11px] text-blue-100/75">Gestão de assistências técnicas</span></span>
+      </a>
+      <div class="relative z-10 my-9 max-w-md lg:my-0 lg:-translate-y-2">
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.07] px-3 py-1.5 text-[11px] font-medium tracking-wide text-blue-100"><span class="size-1.5 rounded-full bg-emerald-300"></span> SUA ASSISTÊNCIA, MAIS SIMPLES</span>
+        <h1 class="mt-5 text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl lg:text-[2.7rem]">Cuidado técnico <span class="block text-blue-200">em cada detalhe.</span></h1>
+        <p class="mt-4 max-w-sm text-sm leading-6 text-blue-100/75 sm:text-[15px]">Gerencie clientes, equipamentos e serviços em um só lugar.</p>
+      </div>
+      <div class="relative z-10 hidden max-w-sm rounded-2xl border border-white/15 bg-white/[0.08] p-4 sm:block">
+        <p class="text-xs font-semibold">Tudo organizado</p>
+        <p class="mt-1 text-[11px] text-blue-100/70">Ordens de serviço, clientes e equipe em sintonia.</p>
+      </div>
+      <p class="relative z-10 mt-6 hidden text-[11px] text-blue-100/55 lg:block">Tecnologia que aproxima pessoas e soluções.</p>
+    </aside>
+
+    <div class="flex min-w-0 flex-col justify-center px-6 py-10 sm:px-12 sm:py-12 lg:px-[4.5rem] lg:py-16">
+      @if (mode === 'login') {
+        <div class="mx-auto w-full max-w-md">
+          <div class="mb-8">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#3478ed]">Bem-vindo de volta</p>
+            <h2 class="mt-2 text-3xl font-semibold tracking-[-0.04em] text-[#172b3d] sm:text-[2.1rem]">Acesse sua conta</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Entre para conhecer todas as telas da plataforma.</p>
+          </div>
+          <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
+            <div class="space-y-5">
+              <div>
+                <label for="login-email" class="mb-2 block text-sm font-medium text-slate-700">E-mail</label>
+                <div class="input-shell"><span class="text-slate-400">✉</span><input id="login-email" autocomplete="username" class="form-input" formControlName="email" placeholder="voce@empresa.com" type="email" /></div>
+                @if (loginForm.controls.email.touched && loginForm.controls.email.invalid) { <p class="field-error">Informe um e-mail válido.</p> }
+              </div>
+              <div>
+                <div class="mb-2 flex items-center justify-between gap-3">
+                  <label for="login-password" class="text-sm font-medium text-slate-700">Senha</label>
+                  <button class="text-xs font-semibold text-[#2869dc]" type="button" (click)="openResetForm()">Esqueceu a senha?</button>
+                </div>
+                <div class="input-shell"><span class="text-slate-400">♙</span><input id="login-password" autocomplete="current-password" class="form-input" formControlName="password" placeholder="Digite sua senha" [type]="isPasswordVisible ? 'text' : 'password'" /><button [attr.aria-label]="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'" class="text-sm text-slate-500" type="button" (click)="togglePasswordVisibility()">{{ isPasswordVisible ? 'Ocultar' : 'Mostrar' }}</button></div>
+                @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) { <p class="field-error">Digite uma senha com pelo menos 6 caracteres.</p> }
+              </div>
+            </div>
+            <label class="mt-5 inline-flex cursor-pointer items-center gap-2.5 text-sm text-slate-600"><input class="size-4 accent-[#3478ed]" formControlName="rememberMe" type="checkbox" />Lembrar meu e-mail neste navegador</label>
+            @if (feedback) { <p class="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700" role="alert">{{ feedback }}</p> }
+            <button class="primary-button mt-7 flex w-full items-center justify-center gap-2" type="submit">Entrar na plataforma <span aria-hidden="true">→</span></button>
+          </form>
+          <div class="my-7 flex items-center gap-4"><span class="h-px flex-1 bg-slate-200"></span><span class="text-[11px] font-medium uppercase tracking-[0.12em] text-slate-400">Acesso demonstrativo</span><span class="h-px flex-1 bg-slate-200"></span></div>
+          <p class="rounded-xl bg-[#f5f8fc] px-4 py-3.5 text-xs leading-5 text-slate-500">Use qualquer e-mail válido e uma senha com 6 caracteres ou mais para explorar a interface. Nenhum dado é enviado ao servidor.</p>
+        </div>
+      } @else {
+        <div class="mx-auto w-full max-w-md">
+          <button class="mb-8 text-sm font-medium text-slate-500" type="button" (click)="mode = 'login'; feedback = ''">← Voltar para o acesso</button>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#3478ed]">Recuperação de acesso</p>
+          <h2 class="mt-2 text-3xl font-semibold text-[#172b3d]">Esqueceu sua senha?</h2>
+          <p class="mt-2 text-sm leading-6 text-slate-500">Informe seu e-mail cadastrado para validar a solicitação.</p>
+          <form class="mt-7" [formGroup]="resetForm" (ngSubmit)="submitReset()" novalidate>
+            <label for="reset-email" class="mb-2 block text-sm font-medium text-slate-700">E-mail cadastrado</label>
+            <div class="input-shell"><span class="text-slate-400">✉</span><input id="reset-email" class="form-input" formControlName="email" placeholder="voce@empresa.com" type="email" /></div>
+            @if (resetForm.controls.email.touched && resetForm.controls.email.invalid) { <p class="field-error">Informe um e-mail válido.</p> }
+            @if (feedback) { <p class="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">{{ feedback }}</p> }
+            <button class="primary-button mt-6 w-full" type="submit">Continuar</button>
+          </form>
+          <p class="mt-5 text-xs leading-5 text-slate-500">A recuperação é somente demonstrativa e não envia e-mails.</p>
+        </div>
+      }
+      <p class="mx-auto mt-10 w-full max-w-md text-center text-[11px] text-slate-400">Sistecnica · Gestão de assistências técnicas</p>
+    </div>
+  </section>
+</main>
