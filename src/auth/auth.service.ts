@@ -1,26 +1,18 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsuariosService } from 'src/usuarios/usuarios.service';
-import { loginDto } from './Login.dto';
-import * as bcrypt from 'bcrypt';
+import { UsuariosService } from './../usuarios/usuarios.service';
+import { Injectable } from '@nestjs/common';
+
 @Injectable()
 export class AuthService {
     constructor(private readonly usuariosService: UsuariosService) {}
 
-    async validarUsuario(loginDto: loginDto){
-        // Aqui serve pra buscar o usuário no PostgreSQL pelo email
-        const usuario = await this.usuariosService.buscarPorEmail(loginDto.email);
+    async validarUsuario(email: string, senha: string,) {
+        const usuario = await this.usuariosService.buscarPorEmail(email);
 
-        if(!usuario){
-            throw new UnauthorizedException('Email ou senha inválidos!');
+        if (!usuario || !usuario.ativo || usuario.senha !== senha) {
+            return null;
         }
 
-        const senhaValida await bcrypt.compare(loginDto.senha, usuario.senha);
-        if(!senhaValida){
-            throw new UnauthorizedException('Email ou senha inválidos');
-        }
-
-        const { senha, ...resultado } = usuario;
-        return resultado;
-
+        const { senha: _senha, ...principal } = usuario;
+        return principal;
     }
 }

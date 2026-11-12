@@ -28,6 +28,7 @@ services:
       DB_NAME: sistech_db
     depends_on:
       - postgres
+    command: sh -c "npm ci && exec npm run start:dev"    
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules

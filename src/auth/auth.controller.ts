@@ -1,4 +1,11 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseGuards, Post, Req } from '@nestjs/common';
+import { LocalAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
-export class AuthController {}
+export class AuthController {
+    @UseGuards(LocalAuthGuard)
+    @Post('login')
+    login(@Req() request: { user: unknown }) {
+        return {usuario: request.user };
+    }
+}
