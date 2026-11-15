@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -34,11 +35,13 @@ export class UsuariosService {
         return this.repository.findOneBy({ email });
     }
 
-    criarUsuario(dto: CriarUsuarioDTO) {
+    async criarUsuario(dto: CriarUsuarioDTO) {
+        const senhaCriptografada = await bcrypt.hash(dto.senha, 10)
+
         return this.repository.manager.transaction(async (manager) => {
             const usuario = this.repository.create({
                 email: dto.email,
-                senha: dto.senha,
+                senha: senhaCriptografada,
                 tipo_usuario: dto.tipo_usuario
             });
 
