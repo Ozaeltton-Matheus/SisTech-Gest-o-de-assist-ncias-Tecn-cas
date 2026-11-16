@@ -336,11 +336,9 @@ export class WorkspacePage {
           ? 'Pendente'
           : this.activePage === 'appointments'
             ? 'Confirmado'
-            : this.activePage === 'orders'
-              ? 'Recebida'
-              : this.activePage === 'budgets'
-                ? 'Pendente'
-                : 'Ativo',
+            : this.activePage === 'budgets'
+              ? 'Pendente'
+              : 'Ativo',
       value: this.draft['value']?.trim() || 'A definir',
       customer: this.draft['customer']?.trim() || name,
       date: this.draft['date']?.trim() || '14/10/2026',

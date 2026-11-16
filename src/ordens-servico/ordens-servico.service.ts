@@ -111,7 +111,6 @@ export class OrdensServicoService {
         return ordem;
 
     }
-    // Atualizar status
     atualizarStatus(
         id: number,
         novoStatus: StatusOS,

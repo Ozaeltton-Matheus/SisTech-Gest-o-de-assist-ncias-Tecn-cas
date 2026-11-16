@@ -1,4 +1,3 @@
-
 import {
   Body,
   Controller,
@@ -8,19 +7,26 @@ import {
   Post,
   Patch,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 
 import { OrdensServicoService } from './ordens-servico.service';
 import { CriarOrdemServicoDto } from './dto/criar-ordem-servico.dto';
 import { RegistrarDiagnosticoDto } from './dto/registrar-diagnostico.dto';
 import { GerarOrcamentoDto } from './dto/gerar-orcamento.dto';
+import { AtualizarStatusDto } from './dto/atualizar-status.dto';
+import { RegistrarAcaoDto } from './dto/registrar-acao.dto';
 import { StatusOS } from './entities/status-os.enum';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { TipoUsuario } from '../auth/tipo-usuario.enum';
 
 @Controller('ordens-servico')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(TipoUsuario.ADMIN, TipoUsuario.FUNCIONARIO)
 export class OrdensServicoController {
-  constructor(
-    private readonly service: OrdensServicoService,
-  ) {}
+  constructor(private readonly service: OrdensServicoService) {}
 
   @Post()
   criar(@Body() dto: CriarOrdemServicoDto) {
@@ -54,19 +60,16 @@ export class OrdensServicoController {
   }
 
   @Post(':id/acoes-reparo')
-  acao(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('descricao') descricao: string,
-  ) {
-    return this.service.registrarAcao(id, descricao);
+  acao(@Param('id', ParseIntPipe) id: number, @Body() dto: RegistrarAcaoDto) {
+    return this.service.registrarAcao(id, dto.descricao);
   }
 
   @Patch(':id/status')
   status(
     @Param('id', ParseIntPipe) id: number,
-    @Body('status') status: StatusOS,
+    @Body() dto: AtualizarStatusDto,
   ) {
-    return this.service.atualizarStatus(id, status);
+    return this.service.atualizarStatus(id, dto.status);
   }
 
   @Post(':id/finalizar')

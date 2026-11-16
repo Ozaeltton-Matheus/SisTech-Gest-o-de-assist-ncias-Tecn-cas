@@ -1,19 +1,24 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { TipoUsuario } from '../../auth/tipo-usuario.enum';
 
 @Entity('usuario')
-export class Usuario{
-    @PrimaryGeneratedColumn({name: 'id_usuario'})
-    id: number;
+export class Usuario {
+  @PrimaryGeneratedColumn({ name: 'id_usuario' })
+  id?: number;
 
-    @Column({ length: 150, unique: true })
-    email: string;
+  @Column({ length: 150, unique: true })
+  email!: string;
 
-    @Column({ length: 255 })
-    senha: string;
+  @Column({
+    name: 'senha',
+    length: 255,
+    select: false,
+  })
+  senha!: string;
 
-    @Column({ name: 'tipo_usuario'})
-    tipo_usuario: string;
-    
-    @Column({ default: true})
-    ativo: boolean;
-}   
+  @Column({ name: 'tipo_usuario', type: 'varchar', length: 50 })
+  tipo_usuario!: TipoUsuario;
+
+  @Column({ default: true })
+  ativo?: boolean;
+}

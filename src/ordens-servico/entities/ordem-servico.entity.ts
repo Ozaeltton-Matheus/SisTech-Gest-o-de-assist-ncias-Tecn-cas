@@ -1,3 +1,5 @@
+import { StatusOS } from './status-os.enum';
+
 export class OrdemServico {
     id: number;
     cliente : string;
@@ -9,7 +11,7 @@ export class OrdemServico {
     valorMaoDeObra?: number;
     valorPecas?: number;
 
-    status?: StatusOS;
+    status: StatusOS;
     acoesReparo: string[];
 
     criadaEm: Date;
