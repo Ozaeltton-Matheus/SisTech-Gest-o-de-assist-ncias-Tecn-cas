@@ -1,6 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { LoginPage } from './login';
+import { RegistrationPage } from './register';
+import { RepairRequestService } from './repair-request';
+import { TechnicianPage } from './technician';
 import { WorkspacePage } from './workspace';
 
 describe('LoginPage', () => {
@@ -8,7 +11,12 @@ describe('LoginPage', () => {
     localStorage.removeItem('sistecnica-remembered-email');
     await TestBed.configureTestingModule({
       imports: [LoginPage],
-      providers: [provideRouter([{ path: 'dashboard', component: LoginPage }])],
+      providers: [
+        provideRouter([
+          { path: 'dashboard', component: LoginPage },
+          { path: 'register', component: RegistrationPage },
+        ]),
+      ],
     }).compileComponents();
   });
 
@@ -77,6 +85,144 @@ describe('LoginPage', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Nenhum e-mail foi enviado.');
+  });
+
+  it('should open the selected profile registration form from login', () => {
+    const fixture = TestBed.createComponent(LoginPage);
+    fixture.detectChanges();
+    const clientLink = fixture.nativeElement.querySelector(
+      'a[href="/register?profile=client"]',
+    ) as HTMLAnchorElement;
+    expect(clientLink.textContent).toContain('Criar conta de cliente');
+  });
+});
+
+describe('RegistrationPage', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [RegistrationPage],
+      providers: [
+        provideRouter([
+          { path: 'register', component: RegistrationPage },
+          { path: 'login', component: LoginPage },
+        ]),
+      ],
+    }).compileComponents();
+  });
+
+  it('should require a profile before showing account fields', () => {
+    const fixture = TestBed.createComponent(RegistrationPage);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Como você deseja se cadastrar?');
+    expect(fixture.nativeElement.querySelector('#register-name')).toBeNull();
+    (fixture.nativeElement.querySelector('button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#register-name')).toBeTruthy();
+  });
+
+  it('should validate and complete a client demo registration', () => {
+    const fixture = TestBed.createComponent(RegistrationPage);
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('form') as HTMLFormElement).dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    );
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Informe seu nome completo.');
+
+    const values: Record<string, string> = {
+      'register-name': 'Ana Costa',
+      'register-document': '12345678901',
+      'register-phone': '11999991234',
+      'register-email': 'ana@example.com',
+      'register-password': 'senha123',
+      'register-confirm-password': 'senha123',
+    };
+    for (const [id, value] of Object.entries(values)) {
+      const input = fixture.nativeElement.querySelector(`#${id}`) as HTMLInputElement;
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    (fixture.nativeElement.querySelector('form') as HTMLFormElement).dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    );
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Cadastro demonstrativo concluído');
+    expect(fixture.nativeElement.textContent).toContain('Nenhum dado foi enviado ou armazenado.');
+  });
+
+  it('should require a specialty for technician registrations', () => {
+    const fixture = TestBed.createComponent(RegistrationPage);
+    fixture.detectChanges();
+    const technicianButton = Array.from(
+      fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>,
+    ).find((button) => button.textContent?.includes('Continuar como técnico'));
+    technicianButton?.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#register-specialty')).toBeTruthy();
+    (fixture.nativeElement.querySelector('form') as HTMLFormElement).dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    );
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Selecione uma especialidade.');
+  });
+});
+
+describe('TechnicianPage', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [TechnicianPage],
+      providers: [provideRouter([{ path: 'login', component: LoginPage }])],
+    }).compileComponents();
+  });
+
+  it('should show the technician dashboard and navigate to assigned orders', () => {
+    const fixture = TestBed.createComponent(TechnicianPage);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Bom dia, Marina.');
+    const ordersButton = Array.from(
+      fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>,
+    ).find((button) => button.textContent?.includes('Minhas ordens'));
+    ordersButton?.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Minhas ordens de serviço');
+    expect(fixture.nativeElement.textContent).toContain('OS #1048');
+  });
+
+  it('should update appointment completion in the technician schedule', () => {
+    const fixture = TestBed.createComponent(TechnicianPage);
+    fixture.detectChanges();
+    const scheduleButton = Array.from(
+      fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>,
+    ).find((button) => button.textContent?.includes('Minha agenda'));
+    scheduleButton?.click();
+    fixture.detectChanges();
+    const completeButton = Array.from(
+      fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>,
+    ).find((button) => button.textContent?.trim() === 'Concluir');
+    completeButton?.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Atendimento de Carla Mendes concluído.');
+    expect(fixture.nativeElement.textContent).toContain('Realizado');
+  });
+
+  it('should show client repair requests in the technician orders', () => {
+    TestBed.inject(RepairRequestService).submit({
+      customer: 'Ana Costa',
+      device: 'Notebook Dell',
+      problem: 'Não liga depois de uma queda de energia.',
+    });
+    const fixture = TestBed.createComponent(TechnicianPage);
+    fixture.detectChanges();
+    const ordersButton = Array.from(
+      fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>,
+    ).find((button) => button.textContent?.includes('Minhas ordens'));
+    ordersButton?.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Notebook Dell');
+    expect(fixture.nativeElement.textContent).toContain('Não liga depois de uma queda de energia.');
   });
 });
 
@@ -247,5 +393,33 @@ describe('WorkspacePage', () => {
     (fixture.nativeElement.querySelector('.approve-panel .button-primary') as HTMLButtonElement).click();
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Aprovação registrada');
+  });
+
+  it('should send a client repair request to the technician work queue', async () => {
+    const fixture = TestBed.createComponent(WorkspacePage);
+    fixture.detectChanges();
+    Array.from(
+      fixture.nativeElement.querySelectorAll('.sidebar-bottom button') as NodeListOf<HTMLButtonElement>,
+    )
+      .find((button) => button.textContent?.includes('Portal do cliente'))
+      ?.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const device = fixture.nativeElement.querySelector('#repair-device') as HTMLInputElement;
+    device.value = 'Notebook Dell';
+    device.dispatchEvent(new Event('input', { bubbles: true }));
+    const problem = fixture.nativeElement.querySelector('#repair-problem') as HTMLTextAreaElement;
+    problem.value = 'Não liga depois de uma queda de energia.';
+    problem.dispatchEvent(new Event('input', { bubbles: true }));
+    (fixture.nativeElement.querySelector('.repair-request-form') as HTMLFormElement).dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    );
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('OS #1050 enviada para avaliação');
+    expect(TestBed.inject(RepairRequestService).requests[0]?.problem).toBe(
+      'Não liga depois de uma queda de energia.',
+    );
   });
 });

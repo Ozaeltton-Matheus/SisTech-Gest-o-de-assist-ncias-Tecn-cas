@@ -56,6 +56,16 @@
           </form>
           <div class="my-7 flex items-center gap-4"><span class="h-px flex-1 bg-slate-200"></span><span class="text-[11px] font-medium uppercase tracking-[0.12em] text-slate-400">Acesso demonstrativo</span><span class="h-px flex-1 bg-slate-200"></span></div>
           <p class="rounded-xl bg-[#f5f8fc] px-4 py-3.5 text-xs leading-5 text-slate-500">Use qualquer e-mail válido e uma senha com 6 caracteres ou mais para explorar a interface. Nenhum dado é enviado ao servidor.</p>
+          <div class="mt-6 grid gap-3 text-center text-sm sm:grid-cols-2">
+            <a class="font-semibold text-[#2869dc] hover:underline" [routerLink]="['/register']" [queryParams]="{ profile: 'client' }">Criar conta de cliente</a>
+            <a class="font-semibold text-[#2869dc] hover:underline" [routerLink]="['/register']" [queryParams]="{ profile: 'technician' }">Criar conta de técnico</a>
+          </div>
+          <div class="mt-4 text-center text-xs text-slate-500">
+            Explorar demonstrações:
+            <a class="font-semibold text-[#2869dc] hover:underline" routerLink="/portal">cliente</a>
+            <span class="px-1">·</span>
+            <a class="font-semibold text-[#2869dc] hover:underline" routerLink="/technician">técnico</a>
+          </div>
         </div>
       } @else {
         <div class="mx-auto w-full max-w-md">
