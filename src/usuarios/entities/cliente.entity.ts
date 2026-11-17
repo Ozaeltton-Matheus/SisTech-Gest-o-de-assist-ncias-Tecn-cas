@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { Usuario } from "./usuarios.entity";
+import { Aparelho } from "src/aparelhos/entities/aparelhos.entity";
 
 @Entity('cliente')
 export class Cliente {
@@ -24,4 +25,7 @@ export class Cliente {
 
     @CreateDateColumn({ name: 'data_cadastro', type: 'timestamptz' })
     data_cadastro!: Date;
+
+    @OneToMany(() => Aparelho, aparelho => aparelho.cliente)
+    aparelhos!: Aparelho[];
 }
