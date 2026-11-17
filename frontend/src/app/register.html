@@ -1,0 +1,120 @@
+<main class="min-h-screen bg-[#f2f5f9] px-4 py-6 sm:px-8 sm:py-10">
+  <section class="mx-auto min-h-[calc(100vh-3rem)] max-w-6xl rounded-2xl bg-white px-5 py-6 shadow-[0_20px_70px_-38px_rgba(18,48,74,0.28)] sm:min-h-[calc(100vh-5rem)] sm:px-10 sm:py-8 lg:px-14">
+    <header class="flex flex-wrap items-center justify-between gap-5">
+      <a class="inline-flex items-center gap-3 text-[#172b3d] no-underline" routerLink="/login">
+        <span class="grid size-11 place-items-center rounded-xl bg-[#3478ed] text-xl font-bold text-white">S</span>
+        <span><strong class="block text-sm tracking-[0.12em]">SISTECNICA</strong><small class="mt-1 block text-xs text-slate-500">Gestão de assistências técnicas</small></span>
+      </a>
+      <div class="flex items-center gap-5 text-sm">
+        <span class="text-slate-500">Já tem uma conta?</span>
+        <a class="font-semibold text-[#2869dc] hover:underline" routerLink="/login">Entrar</a>
+      </div>
+    </header>
+
+    <div class="mx-auto mt-10 w-full max-w-3xl sm:mt-14">
+      <ol aria-label="Etapas do cadastro" class="mx-auto mb-9 flex max-w-md items-center justify-center">
+        <li class="flex items-center gap-2 text-sm font-semibold" [class.text-[#2869dc]]="step === 1" [class.text-slate-400]="step !== 1">
+          <span class="grid size-8 place-items-center rounded-full" [class.bg-[#3478ed]]="step === 1" [class.text-white]="step === 1" [class.bg-slate-100]="step !== 1">1</span>
+          <span class="hidden sm:inline">Escolha do perfil</span>
+        </li>
+        <span aria-hidden="true" class="mx-4 h-px w-12 bg-slate-200 sm:w-20"></span>
+        <li class="flex items-center gap-2 text-sm font-semibold" [class.text-[#2869dc]]="step === 2" [class.text-slate-400]="step !== 2">
+          <span class="grid size-8 place-items-center rounded-full" [class.bg-[#3478ed]]="step === 2" [class.text-white]="step === 2" [class.bg-slate-100]="step !== 2">2</span>
+          <span class="hidden sm:inline">Dados da conta</span>
+        </li>
+      </ol>
+
+      @if (step === 1) {
+        <section>
+          <div class="mb-9 text-center">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#3478ed]">Comece por aqui</p>
+            <h1 class="mt-2 text-3xl font-semibold tracking-[-0.04em] text-[#172b3d]">Como você deseja se cadastrar?</h1>
+            <p class="mt-2 text-sm text-slate-500">Escolha seu perfil para continuar.</p>
+          </div>
+          <div class="grid gap-5 sm:grid-cols-2">
+            <article class="rounded-2xl border border-slate-200 p-6 transition hover:border-[#3478ed] hover:shadow-lg">
+              <span aria-hidden="true" class="text-2xl text-[#3478ed]">♙</span>
+              <h2 class="mt-4 text-xl font-semibold text-[#172b3d]">Sou cliente</h2>
+              <p class="mt-2 min-h-12 text-sm leading-6 text-slate-500">Quero acompanhar meus reparos e aprovar orçamentos.</p>
+              <button class="primary-button mt-5 w-full" type="button" (click)="selectProfile('client')">Continuar como cliente</button>
+            </article>
+            <article class="rounded-2xl border border-slate-200 p-6 transition hover:border-[#3478ed] hover:shadow-lg">
+              <span aria-hidden="true" class="text-2xl text-[#3478ed]">⚒</span>
+              <h2 class="mt-4 text-xl font-semibold text-[#172b3d]">Sou técnico</h2>
+              <p class="mt-2 min-h-12 text-sm leading-6 text-slate-500">Quero gerenciar serviços e acompanhar meus atendimentos.</p>
+              <button class="primary-button mt-5 w-full" type="button" (click)="selectProfile('technician')">Continuar como técnico</button>
+            </article>
+          </div>
+        </section>
+      } @else if (submitted) {
+        <section class="mx-auto max-w-xl rounded-2xl border border-emerald-200 bg-emerald-50 p-7 text-center sm:p-10" role="status">
+          <span aria-hidden="true" class="mx-auto grid size-12 place-items-center rounded-full bg-emerald-100 text-xl text-emerald-700">✓</span>
+          <h1 class="mt-4 text-2xl font-semibold text-[#172b3d]">Cadastro demonstrativo concluído</h1>
+          <p class="mt-3 text-sm leading-6 text-slate-600">Nenhum dado foi enviado ou armazenado. Você pode voltar ao acesso para explorar a interface.</p>
+          <a class="primary-button mt-6 inline-flex items-center justify-center no-underline" [routerLink]="profile === 'client' ? '/portal' : '/technician'">Acessar área demonstrativa</a>
+          <br />
+          <a class="primary-button mt-6 inline-flex items-center justify-center no-underline" routerLink="/login">Voltar para entrar</a>
+        </section>
+      } @else {
+        <section class="mx-auto max-w-2xl">
+          <button class="mb-6 text-sm font-medium text-slate-500 hover:text-[#2869dc]" type="button" (click)="returnToProfileSelection()">← Voltar à escolha do perfil</button>
+          <div class="mb-7">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#3478ed]">Dados da conta</p>
+            <h1 class="mt-2 text-3xl font-semibold tracking-[-0.04em] text-[#172b3d]">{{ profile === 'client' ? 'Criar conta de cliente' : 'Cadastro de técnico' }}</h1>
+            <p class="mt-2 text-sm text-slate-500">{{ profile === 'client' ? 'Preencha seus dados para acompanhar suas ordens de serviço.' : 'Crie seu acesso para gerenciar serviços e atendimentos técnicos.' }}</p>
+          </div>
+
+          <form class="grid gap-x-5 gap-y-4 sm:grid-cols-2" [formGroup]="registrationForm" (ngSubmit)="submitRegistration()" novalidate>
+            <label class="text-sm font-medium text-slate-700 sm:col-span-2" for="register-name">
+              Nome completo
+              <input id="register-name" class="form-input mt-2 w-full rounded-xl border border-slate-200 px-4" autocomplete="name" formControlName="name" placeholder="Digite seu nome completo" />
+              @if (registrationForm.controls.name.touched && registrationForm.controls.name.invalid) { <span class="field-error block">Informe seu nome completo.</span> }
+            </label>
+            <label class="text-sm font-medium text-slate-700" for="register-document">
+              CPF
+              <input id="register-document" class="form-input mt-2 w-full rounded-xl border border-slate-200 px-4" autocomplete="off" formControlName="document" inputmode="numeric" placeholder="000.000.000-00" />
+              @if (registrationForm.controls.document.touched && registrationForm.controls.document.invalid) { <span class="field-error block">Informe seu CPF.</span> }
+            </label>
+            <label class="text-sm font-medium text-slate-700" for="register-phone">
+              Telefone / WhatsApp
+              <input id="register-phone" class="form-input mt-2 w-full rounded-xl border border-slate-200 px-4" autocomplete="tel" formControlName="phone" inputmode="tel" placeholder="(00) 00000-0000" />
+              @if (registrationForm.controls.phone.touched && registrationForm.controls.phone.invalid) { <span class="field-error block">Informe seu telefone com DDD.</span> }
+            </label>
+            <label class="text-sm font-medium text-slate-700 sm:col-span-2" for="register-email">
+              E-mail
+              <input id="register-email" class="form-input mt-2 w-full rounded-xl border border-slate-200 px-4" autocomplete="email" formControlName="email" placeholder="voce@email.com" type="email" />
+              @if (registrationForm.controls.email.touched && registrationForm.controls.email.invalid) { <span class="field-error block">Informe um e-mail válido.</span> }
+            </label>
+            @if (profile === 'technician') {
+              <label class="text-sm font-medium text-slate-700 sm:col-span-2" for="register-specialty">
+                Sua especialização
+                <select id="register-specialty" class="form-input mt-2 w-full rounded-xl border border-slate-200 px-4" formControlName="specialty">
+                  <option value="">Selecione sua especialidade</option>
+                  <option>Smartphones e tablets</option>
+                  <option>Notebooks e computadores</option>
+                  <option>Televisores e áudio</option>
+                  <option>Consoles</option>
+                  <option>Eletrodomésticos</option>
+                </select>
+                @if (registrationForm.controls.specialty.touched && registrationForm.controls.specialty.invalid) { <span class="field-error block">Selecione uma especialidade.</span> }
+              </label>
+            }
+            <label class="text-sm font-medium text-slate-700" for="register-password">
+              Senha
+              <input id="register-password" class="form-input mt-2 w-full rounded-xl border border-slate-200 px-4" autocomplete="new-password" formControlName="password" placeholder="Crie uma senha" type="password" />
+              @if (registrationForm.controls.password.touched && registrationForm.controls.password.invalid) { <span class="field-error block">A senha deve ter pelo menos 6 caracteres.</span> }
+            </label>
+            <label class="text-sm font-medium text-slate-700" for="register-confirm-password">
+              Confirmar senha
+              <input id="register-confirm-password" class="form-input mt-2 w-full rounded-xl border border-slate-200 px-4" autocomplete="new-password" formControlName="confirmPassword" placeholder="Digite a senha novamente" type="password" />
+              @if (registrationForm.controls.confirmPassword.touched && registrationForm.controls.confirmPassword.invalid) { <span class="field-error block">Confirme sua senha.</span> }
+              @if (registrationForm.controls.confirmPassword.touched && registrationForm.hasError('passwordsMismatch')) { <span class="field-error block">As senhas não coincidem.</span> }
+            </label>
+            <button class="primary-button mt-3 w-full sm:col-span-2" type="submit">Finalizar cadastro</button>
+          </form>
+        </section>
+      }
+    </div>
+    <footer class="mt-12 text-center text-xs text-slate-400">Sistecnica · Gestão de assistências técnicas</footer>
+  </section>
+</main>

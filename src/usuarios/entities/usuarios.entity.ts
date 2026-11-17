@@ -24,4 +24,5 @@ export class Usuario{
 
     @OneToMany(() => Funcionario, funcionario => funcionario.usuario)
     funcionarios!: Funcionario[];
+
 }   

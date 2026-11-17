@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
+import { RepairRequestService } from './repair-request';
 
 type Page =
   | 'dashboard'
@@ -37,6 +38,7 @@ interface Item {
 })
 export class WorkspacePage {
   private readonly router = inject(Router);
+  private readonly repairRequests = inject(RepairRequestService);
 
   protected activePage: Page = 'dashboard';
   protected searchTerm = '';
@@ -55,6 +57,8 @@ export class WorkspacePage {
   protected paymentAmount = '';
   protected paymentMethod = 'Pix';
   protected paymentDate = '2026-10-14';
+  protected repairDevice = '';
+  protected repairProblem = '';
   private toastTimer = 0;
 
   protected readonly navigation: { page: Page; label: string; icon: string }[] = [
@@ -408,6 +412,24 @@ export class WorkspacePage {
 
     this.portalApproved = true;
     this.showToast('Aprovação registrada nesta demonstração.');
+  }
+
+  protected submitRepairRequest(): void {
+    const device = this.repairDevice.trim();
+    const problem = this.repairProblem.trim();
+    if (!device || problem.length < 10) {
+      this.showToast('Informe o aparelho e descreva o problema com pelo menos 10 caracteres.');
+      return;
+    }
+
+    const request = this.repairRequests.submit({
+      customer: 'Ana Costa',
+      device,
+      problem,
+    });
+    this.repairDevice = '';
+    this.repairProblem = '';
+    this.showToast(`${request.id} enviada para avaliação da equipe técnica.`);
   }
 
   protected printPage(): void {
