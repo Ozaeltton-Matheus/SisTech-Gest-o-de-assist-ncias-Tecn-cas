@@ -1,0 +1,132 @@
+<div class="min-h-screen bg-[#f4f6fa] text-[#23364a] md:grid md:grid-cols-[230px_minmax(0,1fr)]">
+  <aside class="flex flex-col bg-[#102b43] px-4 py-5 text-slate-200 md:sticky md:top-0 md:h-screen">
+    <a class="mb-8 inline-flex items-center gap-3 text-white no-underline" routerLink="/technician">
+      <span class="grid size-10 place-items-center rounded-xl bg-[#3478ed] text-lg font-bold">S</span>
+      <span><strong class="block text-xs tracking-[0.12em]">SISTECNICA</strong><small class="mt-1 block text-[10px] text-blue-100/70">Gestão de assistências</small></span>
+    </a>
+    <p class="mb-3 px-2 text-[10px] font-semibold tracking-[0.13em] text-slate-400">MEU ESPAÇO TÉCNICO</p>
+    <nav aria-label="Navegação do técnico" class="grid gap-1">
+      @for (item of menu; track item.id) {
+        <button class="flex min-h-10 items-center gap-3 rounded-lg px-3 text-left text-sm transition hover:bg-white/10" [class.bg-[#26496b]]="activeView === item.id" [class.font-semibold]="activeView === item.id" [class.text-white]="activeView === item.id" type="button" (click)="openView(item.id)">
+          <span aria-hidden="true" class="w-5 text-center">{{ item.icon }}</span>{{ item.label }}
+        </button>
+      }
+    </nav>
+    <div class="mt-auto hidden rounded-xl border border-white/10 bg-white/[0.06] p-3 text-xs md:block">
+      <strong class="block text-white">Área exclusiva da sua conta</strong>
+      <span class="mt-1 block leading-5 text-blue-100/70">Consulte ordens, agenda e especialidades.</span>
+    </div>
+    <a class="mt-5 text-xs text-blue-100/80 hover:text-white" routerLink="/login">Sair da demonstração</a>
+  </aside>
+
+  <main class="min-w-0">
+    <header class="flex min-h-16 flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 py-3 sm:px-8">
+      <p class="text-xs text-slate-500">Área do técnico <span class="px-1 text-slate-300">/</span>{{ pageTitle }}</p>
+      <div class="flex items-center gap-3 text-xs">
+        <span class="hidden text-slate-500 sm:inline">Qua, 14 de outubro de 2026</span>
+        <span class="grid size-8 place-items-center rounded-full bg-blue-50 font-semibold text-[#2869dc]">MS</span>
+        <span><strong class="block">{{ profileName }}</strong><small class="text-slate-500">Técnica</small></span>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1500px] space-y-6 p-5 sm:p-8">
+      @if (activeView === 'home') {
+        <section class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-xs font-medium text-slate-500">Área do técnico / Início</p>
+            <h1 class="mt-3 text-3xl font-semibold tracking-tight text-[#172b3d]">Bom dia, {{ profileName.split(' ')[0] }}.</h1>
+            <p class="mt-2 text-sm text-slate-500">Acompanhe suas ordens e organize seus atendimentos de hoje.</p>
+          </div>
+          <button class="rounded-xl bg-[#3478ed] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#2869dc]" type="button" (click)="openView('orders')">＋ Ver minhas ordens</button>
+        </section>
+
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <article class="rounded-2xl border border-slate-200 bg-white p-5"><p class="text-sm text-slate-500">Ordens atribuídas a mim</p><strong class="mt-3 block text-3xl text-[#172b3d]">2</strong><small class="mt-2 block text-xs text-slate-500">#1048 e #1046 em reparo</small></article>
+          <article class="rounded-2xl border border-slate-200 bg-white p-5"><p class="text-sm text-slate-500">Aguardando aprovação</p><strong class="mt-3 block text-3xl text-[#172b3d]">1</strong><small class="mt-2 block text-xs text-amber-700">OS #1048 · execução não liberada</small></article>
+          <article class="rounded-2xl border border-slate-200 bg-white p-5"><p class="text-sm text-slate-500">Em execução</p><strong class="mt-3 block text-3xl text-[#172b3d]">0</strong><small class="mt-2 block text-xs text-slate-500">Nenhum reparo em andamento</small></article>
+          <article class="rounded-2xl border border-slate-200 bg-white p-5"><p class="text-sm text-slate-500">Concluída / pronta</p><strong class="mt-3 block text-3xl text-[#172b3d]">1</strong><small class="mt-2 block text-xs text-emerald-700">OS #1046 · retirada hoje</small></article>
+        </section>
+
+        <section class="flex flex-wrap items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm">
+          <span aria-hidden="true" class="text-amber-700">◷</span>
+          <div><strong class="text-amber-900">OS #1048 aguarda a autorização de Ana Costa</strong><p class="mt-1 text-xs leading-5 text-amber-800">O diagnóstico está concluído. Você pode consultar ou complementar o registro técnico, mas não iniciar o reparo antes da aprovação.</p></div>
+          <button class="ml-auto text-xs font-semibold text-[#2869dc] hover:underline" type="button" (click)="openView('orders')">Ver ordem</button>
+        </section>
+
+        <div class="grid gap-5 xl:grid-cols-[minmax(0,1.7fr)_minmax(270px,0.8fr)]">
+          <section class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+            <div class="mb-5 flex items-center justify-between gap-3">
+              <div><h2 class="font-semibold text-[#172b3d]">Minhas ordens de serviço</h2><p class="mt-1 text-xs text-slate-500">Acompanhe os reparos atribuídos a você.</p></div>
+              <button class="text-xs font-semibold text-[#2869dc] hover:underline" type="button" (click)="openView('orders')">Ver todas as ordens</button>
+            </div>
+            @for (order of orders; track order.id) {
+              <article class="border-t border-slate-100 py-4 first:border-t-0">
+                <div class="flex flex-wrap items-center justify-between gap-2"><h3 class="font-semibold text-[#172b3d]">{{ order.id }} · {{ order.device }}</h3><span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800">{{ order.status }}</span></div>
+                <p class="mt-1 text-xs text-slate-500">{{ order.customer }} · Atualizado hoje</p>
+                <p class="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">{{ order.detail }}</p>
+                <div class="mt-3 flex flex-wrap gap-4"><button class="text-xs font-semibold text-[#2869dc] hover:underline" type="button" (click)="openView('orders')">Consultar diagnóstico</button><button class="text-xs font-semibold text-[#2869dc] hover:underline" type="button" (click)="showToast('Registro técnico aberto nesta demonstração.')">Adicionar registro técnico</button></div>
+              </article>
+            }
+          </section>
+          <section class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+            <div class="mb-4 flex items-center justify-between"><div><h2 class="font-semibold text-[#172b3d]">Minha agenda de hoje</h2><p class="mt-1 text-xs text-slate-500">Quarta-feira, 14 de outubro</p></div><button class="text-xs font-semibold text-[#2869dc] hover:underline" type="button" (click)="openView('schedule')">Ver agenda</button></div>
+            @for (appointment of appointments; track appointment.time) {
+              <div class="border-t border-slate-100 py-4 first:border-t-0">
+                <strong class="text-sm text-[#172b3d]">{{ appointment.time }}</strong>
+                <p class="mt-1 text-sm font-medium">{{ appointment.customer }} · {{ appointment.order }}</p>
+                <p class="mt-1 text-xs text-slate-500">{{ appointment.status }}</p>
+                <button class="mt-2 text-xs font-semibold text-[#2869dc] hover:underline" type="button" (click)="openView('schedule')">Ver compromisso</button>
+              </div>
+            }
+          </section>
+        </div>
+        <section class="grid gap-4 lg:grid-cols-2">
+          <article class="rounded-2xl border border-slate-200 bg-white p-5"><div class="flex items-center justify-between"><div><h2 class="font-semibold text-[#172b3d]">Meu registro técnico</h2><p class="mt-1 text-xs text-slate-500">Diagnósticos e atualizações associados às ordens.</p></div><button class="text-xs font-semibold text-[#2869dc] hover:underline" type="button" (click)="openView('orders')">Abrir registros</button></div><p class="mt-4 text-sm text-slate-600">Diagnóstico concluído: tela danificada e falhas no toque após impacto.</p></article>
+          <article class="rounded-2xl border border-slate-200 bg-white p-5"><div class="flex items-center justify-between"><div><h2 class="font-semibold text-[#172b3d]">Meu perfil e especialidades</h2><p class="mt-1 text-xs text-slate-500">{{ profileName }}</p></div><button class="text-xs font-semibold text-[#2869dc] hover:underline" type="button" (click)="openView('profile')">Editar perfil</button></div><p class="mt-4 text-sm text-slate-600">{{ specialty }}</p></article>
+        </section>
+      } @else if (activeView === 'orders') {
+        <section><p class="text-xs font-medium text-slate-500">Meu espaço técnico / Minhas ordens</p><h1 class="mt-2 text-3xl font-semibold text-[#172b3d]">Minhas ordens de serviço</h1><p class="mt-2 text-sm text-slate-500">Consulte os diagnósticos e atualize o andamento dos reparos.</p></section>
+        <section class="space-y-4">
+          @for (order of orders; track order.id) {
+            <article class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+              <div class="flex flex-wrap items-start justify-between gap-3"><div><h2 class="text-lg font-semibold text-[#172b3d]">{{ order.id }} · {{ order.device }}</h2><p class="mt-1 text-sm text-slate-500">{{ order.customer }}</p></div><span class="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-800">{{ order.status }}</span></div>
+              <div class="mt-5 rounded-xl bg-slate-50 p-4"><strong class="text-xs uppercase tracking-wide text-slate-500">Diagnóstico / registro</strong><p class="mt-2 text-sm leading-6 text-slate-700">{{ order.detail }}</p></div>
+              <div class="mt-4 flex flex-wrap gap-3">
+                <button class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50" type="button" (click)="showToast('Diagnóstico consultado.')">Consultar diagnóstico</button>
+                @if (order.status === 'Aguardando aprovação') {
+                  <button class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-400" type="button" disabled title="Aguarde a aprovação do orçamento">Aguardando aprovação</button>
+                } @else if (order.status === 'Concluída') {
+                  <button class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50" type="button" (click)="updateOrderStatus(order, 'Entregue')">Confirmar entrega</button>
+                } @else {
+                  <button class="rounded-lg bg-[#3478ed] px-3 py-2 text-xs font-semibold text-white hover:bg-[#2869dc]" type="button" (click)="updateOrderStatus(order, 'Concluída')">Concluir reparo</button>
+                }
+              </div>
+            </article>
+          }
+        </section>
+      } @else if (activeView === 'schedule') {
+        <section><p class="text-xs font-medium text-slate-500">Meu espaço técnico / Minha agenda</p><h1 class="mt-2 text-3xl font-semibold text-[#172b3d]">Minha agenda</h1><p class="mt-2 text-sm text-slate-500">Compromissos vinculados aos seus atendimentos.</p></section>
+        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div class="grid grid-cols-[90px_1fr_150px] gap-3 border-b border-slate-100 bg-slate-50 px-5 py-3 text-xs font-semibold text-slate-500"><span>Horário</span><span>Cliente / ordem</span><span>Compromisso</span></div>
+          @for (appointment of appointments; track appointment.time) {
+            <div class="grid grid-cols-[90px_1fr_150px] items-center gap-3 border-b border-slate-100 px-5 py-4 last:border-b-0">
+              <strong class="text-sm">{{ appointment.time }}</strong>
+              <div><strong class="block text-sm">{{ appointment.customer }}</strong><span class="text-xs text-slate-500">{{ appointment.order }}</span></div>
+              <div><span class="block text-xs text-slate-500">{{ appointment.status }}</span>@if (appointment.status !== 'Realizado') { <button class="mt-2 text-xs font-semibold text-[#2869dc] hover:underline" type="button" (click)="completeAppointment(appointment)">Concluir</button> }</div>
+            </div>
+          }
+        </section>
+      } @else {
+        <section><p class="text-xs font-medium text-slate-500">Meu espaço técnico / Perfil e especialidades</p><h1 class="mt-2 text-3xl font-semibold text-[#172b3d]">Meu perfil e especialidades</h1><p class="mt-2 text-sm text-slate-500">Mantenha seus dados de contato e áreas de atuação atualizados.</p></section>
+        <form class="max-w-2xl space-y-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-7" (submit)="$event.preventDefault(); saveProfile()">
+          <label class="block text-sm font-medium text-slate-700">Nome completo<input class="mt-2 block w-full rounded-xl border border-slate-200 px-4 py-3 text-sm" [(ngModel)]="profileName" name="profileName" required /></label>
+          <label class="block text-sm font-medium text-slate-700">Especialidade principal<select class="mt-2 block w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm" [(ngModel)]="specialty" name="specialty"><option>Smartphones e tablets</option><option>Notebooks e computadores</option><option>Televisores e áudio</option><option>Consoles</option></select></label>
+          <button class="rounded-xl bg-[#3478ed] px-5 py-3 text-sm font-semibold text-white hover:bg-[#2869dc]" type="submit">Salvar alterações</button>
+        </form>
+      }
+    </div>
+  </main>
+  @if (toast) {
+    <div aria-live="polite" class="fixed bottom-5 right-5 z-50 rounded-xl bg-[#102b43] px-5 py-3 text-sm font-medium text-white shadow-xl" role="status">{{ toast }}</div>
+  }
+</div>

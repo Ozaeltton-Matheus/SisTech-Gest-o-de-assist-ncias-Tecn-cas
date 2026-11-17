@@ -1,4 +1,4 @@
-<div class="workspace-shell">
+<div class="workspace-shell" [class.portal-shell]="activePage === 'portal'">
   @if (activePage !== 'portal') {
     <aside class="sidebar" [class.sidebar-open]="isMobileMenuOpen">
       <a class="brand-lockup" href="/dashboard" (click)="$event.preventDefault(); navigate('dashboard')">
@@ -21,10 +21,23 @@
       </div>
     </aside>
   } @else {
-    <header class="portal-header">
-      <a class="brand-lockup portal-brand" href="/portal"><span class="brand-mark">S</span><span><strong>SISTECNICA</strong><small>Conecta Assistência · Portal do cliente</small></span></a>
-      <nav class="portal-links"><span>Meus reparos</span><button type="button" (click)="showToast('Canais de atendimento: (11) 4000-2026')">Fale conosco</button><button type="button" (click)="logout()">Sair</button></nav>
-    </header>
+    <aside class="sidebar portal-sidebar">
+      <a class="brand-lockup" href="/portal">
+        <span class="brand-mark">S</span>
+        <span><strong>SISTECNICA</strong><small>Portal do cliente</small></span>
+      </a>
+      <p class="nav-caption">MEU ESPAÇO</p>
+      <nav aria-label="Navegação do cliente" class="sidebar-nav">
+        <a class="portal-nav-item nav-active" href="#portal-order"><span class="nav-icon">▤</span>Meus reparos</a>
+        <a class="portal-nav-item" href="#repair-request"><span class="nav-icon">＋</span>Solicitar conserto</a>
+        <a class="portal-nav-item" href="#portal-budget"><span class="nav-icon">▱</span>Orçamento</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <button type="button" (click)="showToast('Canais de atendimento: (11) 4000-2026')"><span class="nav-icon">?</span>Fale conosco</button>
+        <div class="branch-card"><span class="branch-dot"></span><span><strong>Conecta Assistência</strong><small>Unidade Centro · São Paulo</small></span></div>
+        <button type="button" (click)="logout()"><span class="nav-icon">↗</span>Sair</button>
+      </div>
+    </aside>
   }
 
   <div class="main-column" [class.portal-column]="activePage === 'portal'">
@@ -46,6 +59,14 @@
               <div class="header-popover profile-popover"><strong>Paula Ribeiro</strong><p>Administradora · Conecta Assistência</p><button type="button" (click)="logout()">Sair da demonstração</button></div>
             }
           </div>
+        </div>
+      </header>
+    } @else {
+      <header class="topbar portal-topbar">
+        <p class="breadcrumb">Área do cliente <span>/</span> Meus reparos</p>
+        <div class="topbar-right">
+          <span class="today-label">Conecta Assistência · Unidade Centro</span>
+          <span class="profile-button"><span class="profile-avatar">AC</span><span><strong>Ana Costa</strong><small>Cliente</small></span></span>
         </div>
       </header>
     }
@@ -112,9 +133,33 @@
 
         @case ('portal') {
           <div class="portal-greeting"><div><h1>Olá, Ana. Acompanhe seu conserto.</h1><p>Todas as informações sobre seu iPhone 13, em um só lugar.</p></div><button class="button button-secondary" type="button" (click)="showToast('Fale com a assistência: (11) 4000-2026')">♧ Falar com a assistência</button></div>
-          <section class="panel portal-order"><div class="portal-order-header"><div><h2>iPhone 13 · Ordem de serviço #1048</h2><p>Recebido em 12/10/2026 · Última atualização 13/10/2026 às 15:10</p></div><span class="badge badge-amber">{{ portalApproved ? 'Aprovado pelo cliente' : 'Aguardando sua aprovação' }}</span></div><div class="progress-steps">@for (step of ['Recebido', 'Diagnóstico', 'Aprovação', 'Em reparo', 'Pronto', 'Entregue']; track step; let i = $index) { <div class="progress-step" [class.progress-complete]="i < (portalApproved ? 3 : 2)" [class.progress-current]="i === (portalApproved ? 3 : 2)"><span>{{ i < (portalApproved ? 3 : 2) ? '✓' : i + 1 }}</span><small>{{ step }}</small></div> }</div><p class="portal-estimate">Previsão: 16/10/2026, sujeita à confirmação após a aprovação do orçamento.</p></section>
-          <div class="portal-grid"><div class="portal-main"><section class="panel"><h2>O que identificamos</h2><p class="panel-subtitle">Diagnóstico realizado por Marina Souza em 13/10/2026</p><p>A tela foi danificada pelo impacto e apresenta falhas no toque. A placa e a bateria estão funcionando normalmente.</p><div class="portal-info-grid"><div><small>Como vamos resolver</small><strong>Trocar o conjunto da tela e vedação.</strong></div><div><small>Prazo do reparo</small><strong>2 dias úteis após autorização</strong></div><div><small>Garantia</small><strong>90 dias após a entrega</strong></div></div></section><section class="panel"><h2>Atualizações do seu conserto</h2><ol class="history-list"><li><span class="history-check amber">◷</span><div><small>13 de outubro · 15:10</small><strong>Seu orçamento está disponível</strong><p>Confira os valores e escolha se deseja autorizar o reparo.</p></div></li><li><span class="history-check">✓</span><div><small>13 de outubro · 11:40</small><strong>Diagnóstico concluído</strong><p>Analisamos seu aparelho e identificamos a necessidade de troca da tela.</p></div></li><li><span class="history-check">✓</span><div><small>12 de outubro · 09:20</small><strong>Recebemos seu iPhone 13</strong><p>Seu aparelho foi registrado com fotos e termo de recebimento.</p></div></li></ol><button class="button button-secondary button-small" type="button" (click)="printPage()">▤ Baixar PDF</button></section></div>
-            <aside class="portal-aside"><section class="panel approve-panel"><h2>Aprove seu orçamento</h2><p class="panel-subtitle">ORC-048 · válido até 16/10/2026</p><div class="price-line"><span>Conjunto de tela OLED</span><strong>R$ 300,00</strong></div><div class="price-line"><span>Mão de obra e testes</span><strong>R$ 180,00</strong></div><div class="price-total"><span>Valor total</span><strong>R$ 480,00</strong></div><p class="fine-print">Pagamento na retirada. Nenhum valor foi pago até o momento.</p><label class="consent-check"><input type="checkbox" [checked]="portalConsent" (change)="setPortalConsent($event)" /> Li o orçamento e concordo com os valores, o prazo e a garantia informados.</label><button class="button button-primary button-full" type="button" (click)="approvePortalBudget()">✓ Aprovar R$ 480,00</button><button class="button button-danger button-full" type="button" (click)="showToast('Solicitação de recusa registrada na demonstração.')">Não quero realizar o reparo</button></section><section class="panel"><h2>Precisa de ajuda?</h2><p class="panel-subtitle">Fale com a Conecta Assistência e informe a OS #1048.</p><strong>(11) 4000-2026</strong><p class="fine-print">Segunda a sexta, das 08:00 às 18:00 · Rua São Bento, 85, Centro, São Paulo.</p></section></aside></div>
+          <section class="portal-summary-grid">
+            <article class="panel"><span class="portal-summary-icon">▯</span><div><small>Aparelho em atendimento</small><strong>iPhone 13</strong><span>OS #1048</span></div></article>
+            <article class="panel"><span class="portal-summary-icon amber">◷</span><div><small>Situação atual</small><strong>{{ portalApproved ? 'Reparo autorizado' : 'Aguardando aprovação' }}</strong><span>Orçamento disponível</span></div></article>
+            <article class="panel"><span class="portal-summary-icon green">＄</span><div><small>Valor do orçamento</small><strong>R$ 480,00</strong><span>Pagamento na retirada</span></div></article>
+          </section>
+          <section class="panel repair-request-panel" id="repair-request">
+            <div class="panel-heading">
+              <div><h2>Solicitar conserto</h2><p class="panel-subtitle">Descreva o defeito para a equipe técnica avaliar.</p></div>
+            </div>
+            <form class="repair-request-form" (ngSubmit)="submitRepairRequest()">
+              <div class="repair-request-fields">
+                <label class="note-label" for="repair-device">Aparelho e modelo
+                  <input id="repair-device" class="field-input" name="repairDevice" [(ngModel)]="repairDevice" placeholder="Ex.: iPhone 13, notebook Dell..." required />
+                </label>
+                <label class="note-label" for="repair-problem">Descreva o problema
+                  <textarea id="repair-problem" class="field-input" name="repairProblem" [(ngModel)]="repairProblem" rows="3" maxlength="1000" placeholder="Explique o defeito, quando começou e o que acontece ao usar o aparelho..." required></textarea>
+                </label>
+              </div>
+              <div class="repair-request-footer">
+                <small class="fine-print">A solicitação ficará visível para a equipe técnica nesta demonstração. Não é enviada a um servidor.</small>
+                <button class="button button-primary" type="submit">Enviar para o técnico</button>
+              </div>
+            </form>
+          </section>
+          <section class="panel portal-order" id="portal-order"><div class="portal-order-header"><div><h2>iPhone 13 · Ordem de serviço #1048</h2><p>Recebido em 12/10/2026 · Última atualização 13/10/2026 às 15:10</p></div><span class="badge badge-amber">{{ portalApproved ? 'Aprovado pelo cliente' : 'Aguardando sua aprovação' }}</span></div><div class="progress-steps">@for (step of ['Recebido', 'Diagnóstico', 'Aprovação', 'Em reparo', 'Pronto', 'Entregue']; track step; let i = $index) { <div class="progress-step" [class.progress-complete]="i < (portalApproved ? 3 : 2)" [class.progress-current]="i === (portalApproved ? 3 : 2)"><span>{{ i < (portalApproved ? 3 : 2) ? '✓' : i + 1 }}</span><small>{{ step }}</small></div> }</div><p class="portal-estimate">Previsão: 16/10/2026, sujeita à confirmação após a aprovação do orçamento.</p></section>
+          <div class="portal-grid"><div class="portal-main"><section class="panel"><h2>O que identificamos</h2><p class="panel-subtitle">Diagnóstico realizado por Marina Souza em 13/10/2026</p><p>A tela foi danificada pelo impacto e apresenta falhas no toque. A placa e a bateria estão funcionando normalmente.</p><div class="portal-info-grid"><div><small>Como vamos resolver</small><strong>Trocar o conjunto da tela e vedação.</strong></div><div><small>Prazo do reparo</small><strong>2 dias úteis após autorização</strong></div><div><small>Garantia</small><strong>90 dias após a entrega</strong></div></div></section><section class="panel"><h2>Atualizações do seu conserto</h2><ol class="history-list"><li><span class="history-check amber">◷</span><div><small>13 de outubro · 15:10</small><strong>Seu orçamento está disponível</strong><p>Confira os valores e escolha se deseja autorizar o reparo.</p></div></li><li><span class="history-check">✓</span><div><small>13 de outubro · 11:40</small><strong>Diagnóstico concluído</strong><p>Analisamos seu aparelho e identificamos a necessidade de troca da tela.</p></div></li><li><span class="history-check">✓</span><div><small>12 de outubro · 09:20</small><strong>Recebemos seu iPhone 13</strong><p>Seu aparelho foi registrado com fotos e termo de recebimento.</p></div></ol><button class="button button-secondary button-small" type="button" (click)="printPage()">▤ Baixar PDF</button></section></div>
+            <aside class="portal-aside"><section class="panel approve-panel" id="portal-budget"><h2>Aprove seu orçamento</h2><p class="panel-subtitle">ORC-048 · válido até 16/10/2026</p><div class="price-line"><span>Conjunto de tela OLED</span><strong>R$ 300,00</strong></div><div class="price-line"><span>Mão de obra e testes</span><strong>R$ 180,00</strong></div><div class="price-total"><span>Valor total</span><strong>R$ 480,00</strong></div><p class="fine-print">Pagamento na retirada. Nenhum valor foi pago até o momento.</p><label class="consent-check"><input type="checkbox" [checked]="portalConsent" (change)="setPortalConsent($event)" /> Li o orçamento e concordo com os valores, o prazo e a garantia informados.</label><button class="button button-primary button-full" type="button" (click)="approvePortalBudget()">✓ Aprovar R$ 480,00</button><button class="button button-danger button-full" type="button" (click)="showToast('Solicitação de recusa registrada na demonstração.')">Não quero realizar o reparo</button></section><section class="panel"><h2>Precisa de ajuda?</h2><p class="panel-subtitle">Fale com a Conecta Assistência e informe a OS #1048.</p><strong>(11) 4000-2026</strong><p class="fine-print">Segunda a sexta, das 08:00 às 18:00 · Rua São Bento, 85, Centro, São Paulo.</p></section></aside></div>
           <footer class="page-footer">Acesso privado · seus dados são protegidos <span>Conecta Assistência · Tecnologia SISTECNICA</span></footer>
         }
 

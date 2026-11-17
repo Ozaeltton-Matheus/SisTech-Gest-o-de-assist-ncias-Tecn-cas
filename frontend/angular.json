@@ -55,6 +55,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 3000
+          },
           "configurations": {
             "production": {
               "buildTarget": "sistecnica-frontend:build:production"
