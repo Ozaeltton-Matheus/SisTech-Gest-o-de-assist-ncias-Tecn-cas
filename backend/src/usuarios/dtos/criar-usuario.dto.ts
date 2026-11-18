@@ -1,4 +1,4 @@
-import {IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import {IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, MinLength, ValidateIf } from 'class-validator';
 
 export class CriarUsuarioDTO {
 
@@ -28,7 +28,8 @@ export class CriarUsuarioDTO {
     telefone!: string;
 
     @IsString()
-    @IsOptional()
+    @ValidateIf((dto) => dto.tipo_usuario === 'Funcionario')
+    @IsNotEmpty({message: 'Cargo é obrigatório para funcionário'})
     cargo?: string;
 
     @IsString()

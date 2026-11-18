@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { Cliente } from "./cliente.entity";
 import { Funcionario } from "./funcionario.entity";
 
@@ -19,10 +19,10 @@ export class Usuario{
     @Column({ default: true})
     ativo?: boolean;
 
-    @OneToMany(() => Cliente, cliente => cliente.usuario)
+    @OneToOne(() => Cliente, cliente => cliente.usuario)
     clientes!: Cliente[];
 
-    @OneToMany(() => Funcionario, funcionario => funcionario.usuario)
+    @OneToOne(() => Funcionario, funcionario => funcionario.usuario)
     funcionarios!: Funcionario[];
 
 }   

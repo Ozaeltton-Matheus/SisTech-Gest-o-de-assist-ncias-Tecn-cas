@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, JoinColumn, OneToOne, OneToMany } from "typeorm";
 import { Usuario } from "./usuarios.entity";
 import { Aparelho } from "src/aparelhos/entities/aparelhos.entity";
 
@@ -7,7 +7,7 @@ export class Cliente {
     @PrimaryGeneratedColumn({name: 'id_cliente'})
     id!: number;
 
-    @ManyToOne(() => Usuario, usuario => usuario.clientes)
+    @OneToOne(() => Usuario, usuario => usuario.clientes)
     @JoinColumn({ name: 'id_usuario' })
     usuario!: Usuario;
 
@@ -26,6 +26,6 @@ export class Cliente {
     @CreateDateColumn({ name: 'data_cadastro', type: 'timestamptz' })
     data_cadastro!: Date;
 
-    @OneToMany(() => Aparelho, aparelho => aparelho.cliente)
+    @OneToOne(() => Aparelho, aparelho => aparelho.cliente)
     aparelhos!: Aparelho[];
 }
