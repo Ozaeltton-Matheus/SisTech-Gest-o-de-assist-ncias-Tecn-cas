@@ -3,7 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   JoinColumn,
-  ManyToOne,
+  OneToOne,
   CreateDateColumn
 } from 'typeorm';
 import { Usuario } from './usuarios.entity';
@@ -13,7 +13,7 @@ export class Funcionario {
   @PrimaryGeneratedColumn({ name: 'id_funcionario' })
   id_funcionario!: number;
 
-  @ManyToOne(() => Usuario, usuario => usuario.funcionarios)
+  @OneToOne(() => Usuario, usuario => usuario.funcionarios)
   @JoinColumn({ name: 'id_usuario' })
   usuario!: Usuario;
 
