@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 export class LoginPage {
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly http = inject(HttpClient)
 
   protected mode: 'login' | 'reset' = 'login';
   protected isPasswordVisible = false;
@@ -46,7 +48,24 @@ export class LoginPage {
       localStorage.removeItem('sistecnica-remembered-email');
     }
 
-    void this.router.navigateByUrl('/dashboard');
+    this.feedback = '';
+
+    this.http
+      .post<{ access_token: string }>('http://localhost:3000/auth/login', {
+        email: this.loginForm.controls.email.value,
+        senha: this.loginForm.controls.password.value,
+      })
+      .subscribe({
+        next: (res) => {
+          localStorage.setItem('sistecnica-token', res.access_token);
+          const payload = JSON.parse(atob(res.access_token.split('.')[1]));
+          const destino = payload?.tipo_usuario === 'Cliente' ? '/portal' : '/dashboard';
+          void this.router.navigateByUrl(destino);
+        },
+        error: () => {
+          this.feedback = 'E-mail ou senha inválidos.';
+        },
+      });
   }
 
   protected openResetForm(): void {

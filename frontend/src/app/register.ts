@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 type Profile = 'client' | 'technician';
 
@@ -25,10 +26,12 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
 export class RegistrationPage {
   private readonly formBuilder = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
+  private readonly http = inject(HttpClient);
 
   protected profile: Profile | null = null;
   protected step: 1 | 2 = 1;
   protected submitted = false;
+  protected isSubmitting = false;
 
   protected readonly registrationForm = this.formBuilder.nonNullable.group(
     {
@@ -66,9 +69,38 @@ export class RegistrationPage {
 
   protected submitRegistration(): void {
     this.registrationForm.markAllAsTouched();
-    if (this.registrationForm.invalid || !this.profile) {
+    if (this.registrationForm.invalid || !this.profile || this.isSubmitting) {
       return;
     }
-    this.submitted = true;
+
+    this.isSubmitting = true;
+    const { name, document, email, phone, specialty, password } =
+      this.registrationForm.getRawValue();
+
+    this.http
+      .post('http://localhost:3000/usuarios', {
+        nome: name,
+        email,
+        senha: password,
+        cpf: document,
+        endereco: 'Não informado',
+        telefone: phone,
+        cargo: this.profile === 'technician' ? specialty : undefined,
+        tipo_usuario: this.profile === 'client' ? 'Cliente' : 'Funcionario',
+      })
+      .subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.submitted = true;
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          alert(
+            err?.status === 500
+              ? 'Este e-mail ou CPF já está cadastrado.'
+              : err?.error?.message || 'Erro ao realizar cadastro.',
+          );
+     },
+    });
   }
 }
