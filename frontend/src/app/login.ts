@@ -51,7 +51,7 @@ export class LoginPage {
     this.feedback = '';
 
     this.http
-      .post<{ access_token: string }>('http://localhost:3000/auth/login', {
+      .post<{ access_token: string }>('https://sistech-api.onrender.com/auth/login', {
         email: this.loginForm.controls.email.value,
         senha: this.loginForm.controls.password.value,
       })

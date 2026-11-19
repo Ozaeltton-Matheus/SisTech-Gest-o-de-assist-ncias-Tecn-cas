@@ -78,7 +78,7 @@ export class RegistrationPage {
       this.registrationForm.getRawValue();
 
     this.http
-      .post('http://localhost:3000/usuarios', {
+      .post('https://sistech-api.onrender.com/usuarios', {
         nome: name,
         email,
         senha: password,

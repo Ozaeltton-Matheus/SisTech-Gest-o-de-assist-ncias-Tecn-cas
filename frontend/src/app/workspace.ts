@@ -316,7 +316,7 @@ export class WorkspacePage {
         valor: valorNumerico,
       };
 
-      this.http.post('http://localhost:3000/servicos', payload, { headers }).subscribe({
+      this.http.post('https://sistech-api.onrender.com/servicos', payload, { headers }).subscribe({
         next: () => {
           this.showCreateDialog = false;
           this.showToast('Serviço salvo no banco de dados!');
@@ -384,7 +384,7 @@ export class WorkspacePage {
 
       this.http
         .patch(
-          `http://localhost:3000/servicos/${id}`,
+          `https://sistech-api.onrender.com/servicos/${id}`,
           { nome: name, descricao: this.editDraft.detail.trim() },
           { headers },
         )
@@ -408,7 +408,7 @@ export class WorkspacePage {
       else if (p[0]) body.telefone = p[0];
       if (this.activePage === 'clients' && p[1] && p[1] !== 'Sem telefone') body.telefone = p[1];
       if (this.activePage === 'technicians' && p[1]) body.cargo = p[1];
-      this.http.patch(`http://localhost:3000/usuarios/${id}`, body, { headers }).subscribe({
+      this.http.patch(`https://sistech-api.onrender.com/usuarios/${id}`, body, { headers }).subscribe({
         next: () => { this.editingItemId = ''; this.showToast('Usuário atualizado!'); this.loadCurrentUser(); },
         error: () => this.showToast('Erro ao atualizar usuário.'),
       });
@@ -424,13 +424,13 @@ export class WorkspacePage {
     const headers = { Authorization: `Bearer ${localStorage.getItem('sistecnica-token')}` };
     if (this.activePage === 'services' && item.id.startsWith('SER-')) {
       const id = item.id.replace('SER-', '');
-      this.http.delete(`http://localhost:3000/servicos/${id}`, { headers }).subscribe({
+      this.http.delete(`https://sistech-api.onrender.com/servicos/${id}`, { headers }).subscribe({
         next: () => { this.showToast('Serviço removido!'); this.loadServices(); },
         error: () => this.showToast('Erro ao remover serviço.'),
       });
     } else if ((this.activePage === 'clients' && item.id.startsWith('CLI-')) || (this.activePage === 'technicians' && item.id.startsWith('TEC-'))) {
       const id = item.id.replace(/^(CLI-|TEC-)/, '');
-      this.http.delete(`http://localhost:3000/usuarios/${id}`, { headers }).subscribe({
+      this.http.delete(`https://sistech-api.onrender.com/usuarios/${id}`, { headers }).subscribe({
         next: () => { this.showToast('Usuário removido!'); this.loadCurrentUser(); },
         error: () => this.showToast('Erro ao remover usuário.'),
       });
@@ -640,7 +640,7 @@ export class WorkspacePage {
 
     this.currentUserName = this.formatEmailName(payload?.email);
     if (payload?.sub) {
-      this.http.get<any>(`http://localhost:3000/usuarios/${payload.sub}`, { headers }).subscribe({
+      this.http.get<any>(`https://sistech-api.onrender.com/usuarios/${payload.sub}`, { headers }).subscribe({
         next: (usuario) => {
           this.currentUserName =
             usuario?.clientes?.[0]?.nome ||
@@ -658,7 +658,7 @@ export class WorkspacePage {
       });
     }
 
-    this.http.get<any[]>('http://localhost:3000/usuarios', { headers }).subscribe({
+    this.http.get<any[]>('https://sistech-api.onrender.com/usuarios', { headers }).subscribe({
       next: (usuarios) => {
         const clientesReais: Item[] = [];
         const tecnicosReais: Item[] = [];
@@ -696,7 +696,7 @@ export class WorkspacePage {
       },
     });
 
-    this.http.get<any[]>('http://localhost:3000/aparelhos', { headers }).subscribe({
+    this.http.get<any[]>('https://sistech-api.onrender.com/aparelhos', { headers }).subscribe({
       next: (aparelhos) => {
         const reais: Item[] = (aparelhos ?? []).map((a) => ({
           id: `APL-${a.id}`,
@@ -717,7 +717,7 @@ export class WorkspacePage {
     if (!token) return;
     const headers = { Authorization: `Bearer ${token}` };
 
-    this.http.get<any[]>('http://localhost:3000/servicos', { headers }).subscribe({
+    this.http.get<any[]>('https://sistech-api.onrender.com/servicos', { headers }).subscribe({
       next: (servicos) => {
         const reais: Item[] = (servicos ?? []).map((s) => ({
           id: `SER-${s.id}`,
