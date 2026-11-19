@@ -1,0 +1,52 @@
+#version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sistech_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: sistech_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: ./backend
+    container_name: sistech_api
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgrespassword
+      DB_NAME: sistech_db
+    depends_on:
+      - postgres
+    command: sh -c "npm ci && exec npm run start:dev"    
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: sistech_frontend
+    restart: always
+    ports:
+      - '4200:4200'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm start -- --host 0.0.0.0 --port 4200
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
