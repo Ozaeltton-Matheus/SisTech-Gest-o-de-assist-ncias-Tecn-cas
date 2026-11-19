@@ -17,6 +17,7 @@ import { AparelhosModule } from './aparelhos/aparelhos.module';
       database: process.env.DB_NAME || 'sistech_db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,
+      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     }),
     UsuariosModule,
     AuthModule,

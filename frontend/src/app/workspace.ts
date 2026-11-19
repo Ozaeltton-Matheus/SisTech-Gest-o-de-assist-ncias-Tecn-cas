@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
@@ -39,8 +40,11 @@ interface Item {
 export class WorkspacePage {
   private readonly router = inject(Router);
   private readonly repairRequests = inject(RepairRequestService);
-
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly http = inject(HttpClient);
   protected activePage: Page = 'dashboard';
+  protected currentUserName = 'Usuário';
+
   protected searchTerm = '';
   protected statusFilter = 'Todos';
   protected selectedItem: Item | null = null;
@@ -141,6 +145,7 @@ export class WorkspacePage {
 
   constructor() {
     this.syncPage(this.router.url);
+    this.loadCurrentUser();
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
@@ -293,6 +298,35 @@ export class WorkspacePage {
       this.showToast('Preencha pelo menos o nome do registro.');
       return;
     }
+
+    if (this.activePage === 'services') {
+      const token = localStorage.getItem('sistecnica-token');
+      const headers = { Authorization: `Bearer ${token}` };
+      const valorNumerico =
+        Number(
+          String(this.draft['value'] || '0')
+            .replace(/[^\d,.-]/g, '')
+            .replace(',', '.'),
+        ) || 0;
+
+      const payload = {
+        nome: name,
+        descricao: this.draft['detail']?.trim() || 'Serviço cadastrado',
+        categoria: this.draft['category']?.trim() || 'Geral',
+        valor: valorNumerico,
+      };
+
+      this.http.post('http://localhost:3000/servicos', payload, { headers }).subscribe({
+        next: () => {
+          this.showCreateDialog = false;
+          this.showToast('Serviço salvo no banco de dados!');
+          this.loadServices();
+        },
+        error: () => this.showToast('Erro ao salvar no banco. Verifique os campos.'),
+      });
+      return;
+    }
+
     const list = this.records[this.activePage];
     const row: Item = {
       id: `${this.activePage.slice(0, 3).toUpperCase()}-${String(Date.now()).slice(-4)}`,
@@ -343,10 +377,64 @@ export class WorkspacePage {
       return;
     }
 
+    if (this.activePage === 'services' && item.id.startsWith('SER-')) {
+      const token = localStorage.getItem('sistecnica-token');
+      const headers = { Authorization: `Bearer ${token}` };
+      const id = item.id.replace('SER-', '');
+
+      this.http
+        .patch(
+          `http://localhost:3000/servicos/${id}`,
+          { nome: name, descricao: this.editDraft.detail.trim() },
+          { headers },
+        )
+        .subscribe({
+          next: () => {
+            this.editingItemId = '';
+            this.showToast('Serviço atualizado no banco!');
+            this.loadServices();
+          },
+          error: () => this.showToast('Erro ao atualizar serviço.'),
+        });
+      return;
+    }
+
+    if ((this.activePage === 'clients' && item.id.startsWith('CLI-')) || (this.activePage === 'technicians' && item.id.startsWith('TEC-'))) {
+      const headers = { Authorization: `Bearer ${localStorage.getItem('sistecnica-token')}` };
+      const id = item.id.replace(/^(CLI-|TEC-)/, '');
+      const p = this.editDraft.detail.split('·').map((s) => s.trim());
+      const body: any = { nome: name };
+      if (p[0]?.includes('@')) body.email = p[0];
+      else if (p[0]) body.telefone = p[0];
+      if (this.activePage === 'clients' && p[1] && p[1] !== 'Sem telefone') body.telefone = p[1];
+      if (this.activePage === 'technicians' && p[1]) body.cargo = p[1];
+      this.http.patch(`http://localhost:3000/usuarios/${id}`, body, { headers }).subscribe({
+        next: () => { this.editingItemId = ''; this.showToast('Usuário atualizado!'); this.loadCurrentUser(); },
+        error: () => this.showToast('Erro ao atualizar usuário.'),
+      });
+      return;
+    }
     item.name = name;
     item.detail = this.editDraft.detail.trim();
     this.editingItemId = '';
     this.showToast('Alterações salvas nesta demonstração.');
+  }
+
+  protected deleteRecord(item: Item): void {
+    const headers = { Authorization: `Bearer ${localStorage.getItem('sistecnica-token')}` };
+    if (this.activePage === 'services' && item.id.startsWith('SER-')) {
+      const id = item.id.replace('SER-', '');
+      this.http.delete(`http://localhost:3000/servicos/${id}`, { headers }).subscribe({
+        next: () => { this.showToast('Serviço removido!'); this.loadServices(); },
+        error: () => this.showToast('Erro ao remover serviço.'),
+      });
+    } else if ((this.activePage === 'clients' && item.id.startsWith('CLI-')) || (this.activePage === 'technicians' && item.id.startsWith('TEC-'))) {
+      const id = item.id.replace(/^(CLI-|TEC-)/, '');
+      this.http.delete(`http://localhost:3000/usuarios/${id}`, { headers }).subscribe({
+        next: () => { this.showToast('Usuário removido!'); this.loadCurrentUser(); },
+        error: () => this.showToast('Erro ao remover usuário.'),
+      });
+    }
   }
 
   protected cancelEdit(): void {
@@ -525,4 +613,127 @@ export class WorkspacePage {
   private isListPage(page: Page): page is ListPage {
     return page !== 'dashboard' && page !== 'order-detail' && page !== 'portal';
   }
+
+  protected get userInitials(): string {
+    const parts = this.currentUserName.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return this.currentUserName.slice(0, 2).toUpperCase();
+  }
+
+  private formatEmailName(email?: string): string {
+    if (!email) return 'Usuário';
+    return email
+      .split('@')[0]
+      .replace(/[._-]+/g, ' ')
+      .replace(/\b\w/g, (letra) => letra.toUpperCase());
+  }
+
+  private loadCurrentUser(): void {
+    this.loadServices();
+    const token = localStorage.getItem('sistecnica-token');
+    if (!token) return;
+
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const headers = { Authorization: `Bearer ${token}` };
+
+    this.currentUserName = this.formatEmailName(payload?.email);
+    if (payload?.sub) {
+      this.http.get<any>(`http://localhost:3000/usuarios/${payload.sub}`, { headers }).subscribe({
+        next: (usuario) => {
+          this.currentUserName =
+            usuario?.clientes?.[0]?.nome ||
+            usuario?.funcionarios?.[0]?.nome ||
+            usuario?.cliente?.nome ||
+            usuario?.funcionario?.nome ||
+            usuario?.nome ||
+            this.formatEmailName(usuario?.email || payload?.email);
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.currentUserName = this.formatEmailName(payload?.email);
+          this.cdr.detectChanges();
+        },
+      });
+    }
+
+    this.http.get<any[]>('http://localhost:3000/usuarios', { headers }).subscribe({
+      next: (usuarios) => {
+        const clientesReais: Item[] = [];
+        const tecnicosReais: Item[] = [];
+
+        for (const u of usuarios ?? []) {
+          if (u.tipo_usuario === 'Cliente') {
+            const nome = (u.clientes?.[0]?.nome || u.cliente?.nome || u.nome) || this.formatEmailName(u.email);
+            clientesReais.push({
+              id: `CLI-${u.id}`,
+              name: nome,
+              detail: `${u.email} · ${(u.clientes?.[0]?.telefone || u.cliente?.telefone || 'Sem telefone')}`,
+              category: 'Cadastrado no sistema',
+              status: u.ativo === false ? 'Inativo' : 'Ativo',
+              value: 'R$ 0,00',
+              customer: nome,
+              date: 'Hoje',
+            });
+          } else if (u.tipo_usuario === 'Funcionario') {
+            const nome = (u.funcionarios?.[0]?.nome || u.funcionario?.nome || u.nome) || this.formatEmailName(u.email);
+            tecnicosReais.push({
+              id: `TEC-${u.id}`,
+              name: nome,
+              detail: `${(u.funcionarios?.[0]?.telefone || u.funcionario?.telefone || u.email)} · ${(u.funcionarios?.[0]?.cargo || u.funcionario?.cargo || 'Técnico')}`,
+              category: 'Equipe cadastrada',
+              status: 'Disponível',
+              value: '0 / 4',
+              customer: nome,
+              date: 'Hoje',
+            });
+          }
+        }
+
+        if (clientesReais.length) this.records.clients.unshift(...clientesReais);
+        if (tecnicosReais.length) this.records.technicians.unshift(...tecnicosReais);
+      },
+    });
+
+    this.http.get<any[]>('http://localhost:3000/aparelhos', { headers }).subscribe({
+      next: (aparelhos) => {
+        const reais: Item[] = (aparelhos ?? []).map((a) => ({
+          id: `APL-${a.id}`,
+          name: `${a.marca || ''} ${a.modelo || a.nome || 'Aparelho'}`.trim(),
+          detail: `${a.tipo || 'Equipamento'} · Série: ${a.numero_serie || '—'}`,
+          category: a.tipo || 'Equipamento',
+          status: 'Na assistência',
+          value: '—',
+          customer: a.cliente?.nome || 'Cliente',
+          date: 'Hoje',
+        }));
+        if (reais.length) this.records.devices.unshift(...reais);
+      },
+    });
+  }
+  private loadServices(): void {
+    const token = localStorage.getItem('sistecnica-token');
+    if (!token) return;
+    const headers = { Authorization: `Bearer ${token}` };
+
+    this.http.get<any[]>('http://localhost:3000/servicos', { headers }).subscribe({
+      next: (servicos) => {
+        const reais: Item[] = (servicos ?? []).map((s) => ({
+          id: `SER-${s.id}`,
+          name: s.nome || 'Serviço',
+          detail: s.descricao || 'Serviço cadastrado',
+          category: s.categoria || 'Geral',
+          status: s.ativo === false ? 'Inativo' : 'Ativo',
+          value: s.valor
+            ? Number(s.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            : 'R$ 0,00',
+          customer: '—',
+          date: s.prazo || '2 dias úteis',
+        }));
+        if (reais.length) this.records.services = reais;
+      },
+    });
+  }
+
 }
