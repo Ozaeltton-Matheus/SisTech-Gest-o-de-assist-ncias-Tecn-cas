@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, JoinColumn, OneToOne, OneToMany } from "typeorm";
 import { Usuario } from "./usuarios.entity";
 import { Aparelho } from "src/aparelhos/entities/aparelhos.entity";
+import { OrdemServico } from "src/ordem_servico/entities/ordem_servico.entity";
 
 @Entity('cliente')
 export class Cliente {
@@ -28,4 +29,7 @@ export class Cliente {
 
     @OneToOne(() => Aparelho, aparelho => aparelho.cliente)
     aparelhos!: Aparelho[];
+
+    @OneToMany(() => OrdemServico, ordem_servico => ordem_servico.clientes)
+    ordens_servico!: OrdemServico[];
 }

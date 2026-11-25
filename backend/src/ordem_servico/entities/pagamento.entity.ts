@@ -1,0 +1,24 @@
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { OrdemServico } from "./ordem_servico.entity";
+
+@Entity('pagamento')
+export class Pagamento {
+    @PrimaryGeneratedColumn({ name: 'id_pagamento' })
+    id_pagamento!: number;
+
+    @ManyToOne(()=> OrdemServico, ordemServico => ordemServico.pagamentos)
+    @JoinColumn({ name: 'id_os' })
+    ordensServico!: OrdemServico;
+
+    @Column({ name: 'valor', type: 'decimal' })
+    valor!: number;
+
+    @Column({ name: 'data_pagamento', type: 'date' })
+    data_pagamento!: Date;
+
+    @Column({ name: 'forma_pagamento', type: 'varchar' })
+    forma_pagamento!: string;
+
+    @Column({ name: 'status', type: 'varchar' })
+    status!: string;
+}
