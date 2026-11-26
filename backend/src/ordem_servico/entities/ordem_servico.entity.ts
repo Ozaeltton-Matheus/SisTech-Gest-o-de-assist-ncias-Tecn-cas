@@ -27,20 +27,23 @@ export class OrdemServico {
     @JoinColumn({ name: 'id_funcionario' })
     funcionarios!: Funcionario;
 
-    @Column({ name: 'data_abertura', type: 'date' })
-    data_abertura!: Date;
+    @Column({ name: 'data_abertura', type: 'date', default: () => "CURRENT_DATE" })
+    data_abertura!: string;
 
-    @Column({ name: 'defeito relatado', type: 'text'})
+    @Column({ name: 'defeito_relatado', type: 'text'})
     defeito_relatado!: string;
 
-    @Column({ name: 'observacoes', type: 'text' })
+    @Column({ name: 'observacoes', type: 'text', nullable: true })
     observacoes!: string;
 
-    @Column({ name: 'status_atual', type: 'varchar', length: 30 })
+    @Column({ name: 'status_atual', type: 'varchar', length: 30, default: 'RECEBIDO' })
     status_atual!: string;
 
     @Column({ name: 'data_finalizacao', type: 'date', nullable: true })
-    data_finalizacao!: Date;
+    data_finalizacao!: string;
+
+    @Column({ name: "valor_total", type: "decimal", precision: 10, scale: 2, default: 0.00 })
+    valor_total!: number;
 
     @OneToMany(() => HistoricoStatusOS, historicoStatusOS => historicoStatusOS.ordens_servico)
     historicostatus!: HistoricoStatusOS[];
@@ -61,6 +64,6 @@ export class OrdemServico {
     diagnosticos!: Diagnostico[];
 
     @OneToMany(() => Orcamento, orcamento => orcamento.ordens_servico)
-    orcamentos!: Orcamento;
+    orcamentos!: Orcamento[];
 
 }

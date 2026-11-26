@@ -6,16 +6,16 @@ export class Servico {
     @PrimaryGeneratedColumn({ name: 'id_servico' })
     id_servico!: number;
 
-    @Column({ name: 'nome', length: 150 })
+    @Column({ name: 'nome', type: 'varchar', length: 150 })
     nome!: string;
 
     @Column({ name: 'descricao', type: 'text' })
     descricao!: string;
 
-    @Column({ name: 'preco_aplicado', type: 'decimal' })
-    preco_aplicado!: number;
+    @Column({ name: 'preco', type: 'decimal', precision: 10, scale: 2, default: 0.00 })
+    preco!: number;
 
-    @Column({ name: 'ativo', type: 'boolean' })
+    @Column({ name: 'ativo', type: 'boolean', default: true })
     ativo!: boolean;
 
     @OneToMany(() => OS_Servico, osServico => osServico.servicos)

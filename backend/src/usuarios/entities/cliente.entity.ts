@@ -5,7 +5,7 @@ import { OrdemServico } from "src/ordem_servico/entities/ordem_servico.entity";
 
 @Entity('cliente')
 export class Cliente {
-    @PrimaryGeneratedColumn({name: 'id_cliente'})
+    @PrimaryGeneratedColumn({ name: 'id_cliente' })
     id!: number;
 
     @OneToOne(() => Usuario, usuario => usuario.clientes)
