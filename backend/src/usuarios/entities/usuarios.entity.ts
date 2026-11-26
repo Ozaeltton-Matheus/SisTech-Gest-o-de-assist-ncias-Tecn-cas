@@ -4,19 +4,19 @@ import { Funcionario } from "./funcionario.entity";
 
 @Entity('usuario')
 export class Usuario{
-    @PrimaryGeneratedColumn({name: 'id_usuario'})
+    @PrimaryGeneratedColumn({ name: 'id_usuario' })
     id?: number;
 
-    @Column({ length: 150, unique: true })
+    @Column({ name: 'nome', length: 150, unique: true })
     email!: string;
 
-    @Column({name: 'senha', length: 255 })
+    @Column({ name: 'senha', length: 255 })
     senha!: string;
 
-    @Column({ name: 'tipo_usuario', length: 50})
+    @Column({ name: 'tipo_usuario', length: 50 })
     tipo_usuario!: string;
 
-    @Column({ default: true})
+    @Column({ name: 'ativo', default: true} )
     ativo?: boolean;
 
     @OneToOne(() => Cliente, cliente => cliente.usuario)

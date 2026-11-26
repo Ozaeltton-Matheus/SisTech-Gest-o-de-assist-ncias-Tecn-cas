@@ -1,3 +1,4 @@
+import { OrdemServicoModule } from './ordem_servico/ordem_servico.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -21,7 +22,8 @@ import { AparelhosModule } from './aparelhos/aparelhos.module';
     }),
     UsuariosModule,
     AuthModule,
-    AparelhosModule
+    AparelhosModule,
+    OrdemServicoModule
   ],
   controllers: [AppController],
   providers: [AppService],
