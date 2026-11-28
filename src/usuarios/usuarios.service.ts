@@ -7,12 +7,18 @@ import * as argon2 from 'argon2';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from './entities/usuarios.entity';
+<<<<<<< Updated upstream
 import { CriarUsuarioDTO } from './dtos/criar-usuario.dto';
 import { CriarUsuarioAdminDto } from './dtos/criar-usuario-admin.dto';
 import { AtualizarUsuarioDto } from './dtos/atualizar-usuario.dto';
 import { UsuarioPublico } from './interfaces/usuario-publico.interface';
 import { TipoUsuario } from '../auth/tipo-usuario.enum';
 
+=======
+import { Cliente } from './entities/cliente.entity';
+import { Funcionario } from './entities/funcionario.entity';
+import { UsuarioRespostaDTO } from './dtos/usuario-resposta.dto';
+>>>>>>> Stashed changes
 @Injectable()
 export class UsuariosService {
   constructor(
@@ -28,6 +34,7 @@ export class UsuariosService {
     return argon2.verify(hash, password);
   }
 
+<<<<<<< Updated upstream
   async create(dto: CriarUsuarioDTO): Promise<UsuarioPublico> {
     return this.createWithRole(dto, TipoUsuario.CLIENTE);
   }
@@ -91,6 +98,63 @@ export class UsuariosService {
       throw new InternalServerErrorException(
         'Usuário persistido sem identificador',
       );
+=======
+    async listar(): Promise<UsuarioRespostaDTO[]> {
+        const usuarios = await this.repository.find({ order: { id: 'ASC' } });
+        return usuarios.map(usuario => UsuarioRespostaDTO.fromEntity(usuario));
+    }
+
+    async buscarPorId(id: number) {
+        const usuario = await this.repository.findOneBy({ id });
+        if (!usuario) {
+            throw new NotFoundException('Usuario não encontrado');
+        }
+        return usuario;
+    }
+
+    buscarPorEmail(email: string) {
+        return this.repository.findOneBy({ email });
+    }
+
+    async criarUsuario(dto: CriarUsuarioDTO): Promise<UsuarioRespostaDTO> {
+        const senhaCriptografada = await bcrypt.hash(dto.senha, 10)
+
+        const usuarioSalvo = await this.repository.manager.transaction(async (manager) => {
+            const usuario = this.repository.create({
+                email: dto.email,
+                senha: senhaCriptografada,
+                tipo_usuario: dto.tipo_usuario
+            });
+
+            const usuarioSalvo = await manager.save(usuario)
+
+            if (dto.tipo_usuario === "Cliente") {
+                const cliente = this.clienteRepository.create({
+                    nome: dto.nome,
+                    cpf: dto.cpf,
+                    telefone: dto.telefone,
+                    endereco: dto.endereco,
+                    usuario: usuarioSalvo
+                });
+                await manager.save(cliente);
+            }
+
+            else if (dto.tipo_usuario === 'Funcionario') {
+                const funcionario = this.funcionarioRepository.create({
+                    nome: dto.nome,
+                    cpf: dto.cpf,
+                    telefone: dto.telefone,
+                    cargo: dto.cargo,
+                    usuario: usuarioSalvo
+                });
+                await manager.save(funcionario);
+            }
+            
+            return usuarioSalvo;
+        });
+
+        return UsuarioRespostaDTO.fromEntity(usuarioSalvo);
+>>>>>>> Stashed changes
     }
 
     return {
